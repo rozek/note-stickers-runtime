@@ -440,7 +440,7 @@
   class ConsoleView extends Component {
     private _Geometry:SNS_Geometry
     private _DragRecognizer:Function|undefined
-    private _DragOffset:SNS_Position
+    private _DragOffset:SNS_Geometry
     private _DragMode:'drag'|'resize-sw'|'resize-s'|'resize-se'|undefined
 
     public state:Indexable = { Value:0 }
