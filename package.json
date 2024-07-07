@@ -1,0 +1,42 @@
+{
+  "name": "note-stickers-runtime",
+  "version": "0.0.4",
+  "description": "runtime for web applications based on \"shareable-note-stickers\"",
+  "type": "module",
+  "source": "src/note-stickers-runtime.ts",
+  "exports": {
+    "types": "./dist/note-stickers-runtime.d.ts",
+    "default": "./dist/note-stickers-runtime.js"
+  },
+  "module": "./dist/note-stickers-runtime.js",
+  "svelte": "./dist/note-stickers-runtime.js",
+  "types": "./dist/note-stickers-runtime.d.ts",
+  "keywords": [],
+  "author": "Andreas Rozek <a.rozek@gmx.de> (https://www.rozek.de/)",
+  "license": "MIT",
+  "homepage": "https://github.com/rozek/note-stickers-runtime#readme",
+  "bugs": {
+    "url": "https://github.com/rozek/note-stickers-runtime/issues"
+  },
+  "scripts": {
+    "compile": "tsc --target esnext --moduleResolution nodenext --module nodenext --skipLibCheck --allowSyntheticDefaultImports ./src/note-stickers-runtime.ts",
+    "build": "rimraf ./dist && mkdir ./dist && npm run compile && mv ./src/note-stickers-runtime.js ./dist && cp ./index.html ./dist && mkdir ./dist/common ./dist/icons && cp ./common/* ./dist/common/ && cp ./icons/* ./dist/icons/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rozek/note-stickers-runtime.git"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "htm": "github:rozek/htm",
+    "hyperactiv": "github:rozek/hyperactiv",
+    "javascript-interface-library": "github:rozek/javascript-interface-library",
+    "protoux": "github:rozek/protoux",
+    "shareable-note-stickers": "github:rozek/shareable-note-stickers",
+    "sns-boardview": "github:rozek/sns-boardview"
+  }
+}
