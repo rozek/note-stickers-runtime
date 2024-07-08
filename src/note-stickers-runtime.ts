@@ -422,6 +422,7 @@
       const me = this
 
       return html`<${SNS_BoardView}
+        PUX=${PUX}
         Mode="run"
         Board=${Applet.chosenBoard} StickerList=${Applet.StickerList}
         selectedStickers=${Applet.selectedStickers}
@@ -611,6 +612,7 @@
   ):void {
     const Applet:SNS_AppletObservables = AppletRegistry[Project.Name]
 
+console.log('ProjectChangeCallback',Change,ArgList)
     switch (Change) {
 //    case 'createBoard':    // Board
 //    case 'attachBoard':    // Board, Folder, Index
@@ -672,6 +674,7 @@
   function ProjectRenderCallback (
     Project:SNS_Project, Board:SNS_Board|undefined, Sticker:SNS_Sticker|undefined
   ):void {
+console.log('ProjectRenderCallback',Board,Sticker)
     const Applet:SNS_AppletObservables = AppletRegistry[Project.Name]
     if ((Board === Applet.chosenBoard) || (Applet.chosenBoard == null)) {
       Applet.View.rerender()
