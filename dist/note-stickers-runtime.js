@@ -299,6 +299,7 @@ class AppletView extends Component {
         Applet.View = this;
         const me = this;
         return html `<${SNS_BoardView}
+        PUX=${PUX}
         Mode="run"
         Board=${Applet.chosenBoard} StickerList=${Applet.StickerList}
         selectedStickers=${Applet.selectedStickers}
@@ -468,6 +469,7 @@ class ConsoleView extends Component {
 /**** ProjectChangeCallback ****/
 function ProjectChangeCallback(Project, Change, ...ArgList) {
     const Applet = AppletRegistry[Project.Name];
+    console.log('ProjectChangeCallback', Change, ArgList);
     switch (Change) {
         //    case 'createBoard':    // Board
         //    case 'attachBoard':    // Board, Folder, Index
@@ -517,6 +519,7 @@ function ProjectChangeCallback(Project, Change, ...ArgList) {
 }
 /**** ProjectRenderCallback ****/
 function ProjectRenderCallback(Project, Board, Sticker) {
+    console.log('ProjectRenderCallback', Board, Sticker);
     const Applet = AppletRegistry[Project.Name];
     if ((Board === Applet.chosenBoard) || (Applet.chosenBoard == null)) {
         Applet.View.rerender();
