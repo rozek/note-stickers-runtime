@@ -436,7 +436,14 @@ class ConsoleView extends Component {
         return html `<div class="PUX ResizableDialog" style="
         position:fixed; ${CSSGeometry}
       ">
-        <div class="ContentPane">${ConsoleValue}</div>
+        <div class="ContentPane">
+          <textarea readonly style="
+            display:block; position:absolute;
+            left:0px; top:0px; right:0px; bottom:0px;
+            padding:4px; resize:none;
+            border:none; color:green;
+          " value=${ConsoleValue}/>
+        </div>
 
         <div class="Titlebar"
           onPointerDown=${DragRecognizer} onPointerUp=${DragRecognizer}
