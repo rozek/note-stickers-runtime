@@ -35,6 +35,7 @@
   type Serializable       = serializableObject
 
   const PUX = new ProtoUX()
+    PUX['_ImageFolder'] = './icons/'
 
 //------------------------------------------------------------------------------
 //--                             Applet Registry                              --
@@ -149,18 +150,18 @@
     visitBoard(Applet, VisitHistory[Applet.VisitIndex] || Applet.Project.BoardList[0])
   }
 
-/**** showConsole ****/
+/**** openConsole ****/
 
-  function showConsole (Applet:Indexable):void {
+  function openConsole (Applet:Indexable):void {
     if (! Applet.ConsoleIsOpen) {
       Applet.ConsoleIsOpen = true
       Applet.View.rerender()
     }
   }
 
-/**** hideConsole ****/
+/**** closeConsole ****/
 
-  function hideConsole (Applet:Indexable):void {
+  function closeConsole (Applet:Indexable):void {
     if (Applet.ConsoleIsOpen) {
       Applet.ConsoleIsOpen = false
       Applet.View.rerender()
@@ -359,11 +360,18 @@
       return
     }
 
+    const firstBoard = Project.Board(0)
+
     const Applet:SNS_AppletObservables = AppletRegistry[Name] = observe({
-      Project, chosenBoard:undefined,
-      StickerList:[], selectedStickers:[], StickerSelectionGeometries:[],
-      SnapToGrid:false, GridWidth:10, GridHeight:10,
-      VisitHistory:[], VisitIndex:-1, View:undefined, ViewState:0,
+      Project, chosenBoard:firstBoard,
+      StickerList:(firstBoard == null ? [] : firstBoard.StickerList),
+      selectedStickers:[], StickerSelectionGeometries:[],
+      SnapToGrid:(firstBoard == null ? false : firstBoard.SnapToGrid),
+      GridWidth: (firstBoard == null ? 10 : firstBoard.GridWidth  || 10),
+      GridHeight:(firstBoard == null ? 10 : firstBoard.GridHeight || 10),
+      VisitHistory:(firstBoard == null ? [] : [firstBoard]),
+      VisitIndex:  (firstBoard == null ? -1 : 0),
+      View:undefined, ViewState:0,
       ConsoleIsOpen:false,
       ConsoleGeometry:{
         x:-Number.MAX_SAFE_INTEGER,y:-Number.MAX_SAFE_INTEGER, Width:320,Height:240
@@ -379,8 +387,8 @@
       visitPrevBoard:visitPrevBoard.bind(null,Applet),
       visitNextBoard:visitNextBoard.bind(null,Applet),
       visitBoard:    visitBoard.bind(null,Applet),
-      showConsole: showConsole.bind(null,Applet),
-      hideConsole: hideConsole.bind(null,Applet),
+      openConsole: openConsole.bind(null,Applet),
+      closeConsole:closeConsole.bind(null,Applet),
       clearConsole:clearConsole.bind(null,Applet),
       print:  print.bind(null,Applet),
       println:println.bind(null,Applet),
@@ -409,6 +417,7 @@
 
     public render (PropSet:Indexable):any {
       const { PUX, Applet } = PropSet
+      Applet.View = this
 
       const me = this
 
@@ -418,9 +427,12 @@
         selectedStickers=${Applet.selectedStickers}
         onSelectionChange=${(selectedStickers:SNS_Sticker[]) => {
           Applet.selectedStickers = selectedStickers.slice()
+          Applet.StickerSelectionGeometries = selectedStickers.map(
+            (Sticker:SNS_Sticker) => Sticker.Geometry
+          )
           me.rerender()
         }}
-        LassoMode="contain"
+        LassoMode="enclose"
         onGeometryChange=${(StickerList:SNS_Sticker[],GeometryList:SNS_Geometry[]) => {
           changeStickerGeometries(StickerList,GeometryList)
           me.rerender()
@@ -560,7 +572,8 @@
 
       return html`<div class="PUX ResizableDialog" style="
         position:fixed; ${CSSGeometry}
-      " <div class="ContentPane">${ConsoleValue}</div>
+      ">
+        <div class="ContentPane">${ConsoleValue}</div>
 
         <div class="Titlebar"
           onPointerDown=${DragRecognizer} onPointerUp=${DragRecognizer}
