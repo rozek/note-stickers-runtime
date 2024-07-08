@@ -446,13 +446,13 @@
   }
 
 //------------------------------------------------------------------------------
-//--                                ConsoleView                                --
+//--                               ConsoleView                                --
 //------------------------------------------------------------------------------
 
   class ConsoleView extends Component {
-    private _Geometry:SNS_Geometry
+    private _Geometry:SNS_Geometry       // actual, constrained console geometry
     private _DragRecognizer:Function|undefined
-    private _DragOffset:SNS_Geometry
+    private _DragOffset:SNS_Geometry           // console geometry at drag start
     private _DragMode:'drag'|'resize-sw'|'resize-s'|'resize-se'|undefined
 
     public state:Indexable = { Value:0 }
@@ -493,16 +493,17 @@
       }
 
       const moveDialog = (Applet:Indexable, dx:number,dy:number) => {
-        positionAt(Applet, my._DragOffset.x + dx,my._DragOffset.y + dy)
+        positionAt(Applet, my._DragOffset.x+dx,my._DragOffset.y+dy)
       }
 
       const resizeDialog = (Applet:Indexable, dx:number,dy:number) => {
-        let newWidth:number = my._Geometry.Width
+        let newWidth:number = my._DragOffset.Width
         switch (my._DragMode) {
           case 'resize-sw':
-            newWidth =  Math.max(minWidth,Math.min(my._DragOffset.Width-dx,maxWidth || Infinity))
+            newWidth = Math.max(minWidth,Math.min(my._DragOffset.Width-dx,maxWidth || Infinity))
               dx = newWidth-my._DragOffset.Width
             positionAt(Applet, my._DragOffset.x-dx,my._DragOffset.y)
+
             newWidth = my._DragOffset.Width+dx
             break
           case 'resize-se':
@@ -527,7 +528,7 @@
               default:                                  my._DragMode = 'drag'
             }
 
-            my._DragOffset = { ...ConsoleGeometry }
+            my._DragOffset = { ...my._Geometry }
             handleDrag(x,y, dx,dy)
           },
           onDragContinued: handleDrag,
@@ -548,9 +549,7 @@
         x = Math.max(0, Math.min(x,window.innerWidth-40))
         y = Math.max(0, Math.min(y,window.innerHeight-30))
 
-        Applet.ConsoleGeometry = {
-          ...Applet.ConsoleGeometry, x,y
-        }
+        Applet.ConsoleGeometry = { ...Applet.ConsoleGeometry, x,y }
         Applet.View.rerender()
       }
 
@@ -558,9 +557,7 @@
         Width  = Math.max(40,Width)
         Height = Math.max(30,Height)
 
-        Applet.ConsoleGeometry = {
-          ...Applet.ConsoleGeometry, Width,Height
-        }
+        Applet.ConsoleGeometry = { ...Applet.ConsoleGeometry, Width,Height }
         Applet.View.rerender()
       }
 
