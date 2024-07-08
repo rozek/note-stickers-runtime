@@ -20,7 +20,7 @@
   },
   "scripts": {
     "compile": "tsc --target esnext --moduleResolution nodenext --module nodenext --skipLibCheck --allowSyntheticDefaultImports ./src/note-stickers-runtime.ts",
-    "build": "rimraf ./dist && mkdir ./dist && npm run compile && mv ./src/note-stickers-runtime.js ./dist && cp ./index.html ./dist && mkdir ./dist/common ./dist/icons && cp ./common/* ./dist/common/ && cp ./icons/* ./dist/icons/",
+    "build": "rimraf ./dist && mkdir ./dist && npm run compile && mv ./src/note-stickers-runtime.js ./dist && mkdir ./dist/common ./dist/icons && cp ./common/* ./dist/common/ && cp ./icons/* ./dist/icons/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
