@@ -320,12 +320,12 @@ class AppletView extends Component {
     }
 }
 //------------------------------------------------------------------------------
-//--                                ConsoleView                                --
+//--                               ConsoleView                                --
 //------------------------------------------------------------------------------
 class ConsoleView extends Component {
-    _Geometry;
+    _Geometry; // actual, constrained console geometry
     _DragRecognizer;
-    _DragOffset;
+    _DragOffset; // console geometry at drag start
     _DragMode;
     state = { Value: 0 };
     rerender() {
@@ -367,7 +367,7 @@ class ConsoleView extends Component {
             positionAt(Applet, my._DragOffset.x + dx, my._DragOffset.y + dy);
         };
         const resizeDialog = (Applet, dx, dy) => {
-            let newWidth = my._Geometry.Width;
+            let newWidth = my._DragOffset.Width;
             switch (my._DragMode) {
                 case 'resize-sw':
                     newWidth = Math.max(minWidth, Math.min(my._DragOffset.Width - dx, maxWidth || Infinity));
@@ -402,7 +402,7 @@ class ConsoleView extends Component {
                             break;
                         default: my._DragMode = 'drag';
                     }
-                    my._DragOffset = { ...ConsoleGeometry };
+                    my._DragOffset = { ...my._Geometry };
                     handleDrag(x, y, dx, dy);
                 },
                 onDragContinued: handleDrag,
@@ -419,17 +419,13 @@ class ConsoleView extends Component {
         function positionAt(Applet, x, y) {
             x = Math.max(0, Math.min(x, window.innerWidth - 40));
             y = Math.max(0, Math.min(y, window.innerHeight - 30));
-            Applet.ConsoleGeometry = {
-                ...Applet.ConsoleGeometry, x, y
-            };
+            Applet.ConsoleGeometry = { ...Applet.ConsoleGeometry, x, y };
             Applet.View.rerender();
         }
         function sizeTo(Applet, Width, Height) {
             Width = Math.max(40, Width);
             Height = Math.max(30, Height);
-            Applet.ConsoleGeometry = {
-                ...Applet.ConsoleGeometry, Width, Height
-            };
+            Applet.ConsoleGeometry = { ...Applet.ConsoleGeometry, Width, Height };
             Applet.View.rerender();
         }
         const CSSGeometry = (`left:${x}px; top:${y}px; width:${Width}px; height:${Height}px; right:auto; bottom:auto;`);
