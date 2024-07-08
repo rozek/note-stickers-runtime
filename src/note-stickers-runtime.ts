@@ -371,7 +371,7 @@
       GridHeight:(firstBoard == null ? 10 : firstBoard.GridHeight || 10),
       VisitHistory:(firstBoard == null ? [] : [firstBoard]),
       VisitIndex:  (firstBoard == null ? -1 : 0),
-      View:undefined, ViewState:0,
+      View:{ rerender:() => {} }, ViewState:0,                  // initial Dummy
       ConsoleIsOpen:false,
       ConsoleGeometry:{
         x:-Number.MAX_SAFE_INTEGER,y:-Number.MAX_SAFE_INTEGER, Width:320,Height:240
@@ -394,9 +394,9 @@
       println:println.bind(null,Applet),
     }
 
-    Project.onChange(ProjectChangeCallback)
-    Project.onRender(ProjectRenderCallback)
-    Project.onError (ProjectErrorCallback)
+    Project.onChange   (ProjectChangeCallback)
+    Project.onRendering(ProjectRenderCallback)
+    Project.onError    (ProjectErrorCallback)
 
     Project.recursivelyActivateAllScripts()
 
@@ -612,7 +612,6 @@
   ):void {
     const Applet:SNS_AppletObservables = AppletRegistry[Project.Name]
 
-console.log('ProjectChangeCallback',Change,ArgList)
     switch (Change) {
 //    case 'createBoard':    // Board
 //    case 'attachBoard':    // Board, Folder, Index
@@ -674,7 +673,6 @@ console.log('ProjectChangeCallback',Change,ArgList)
   function ProjectRenderCallback (
     Project:SNS_Project, Board:SNS_Board|undefined, Sticker:SNS_Sticker|undefined
   ):void {
-console.log('ProjectRenderCallback',Board,Sticker)
     const Applet:SNS_AppletObservables = AppletRegistry[Project.Name]
     if ((Board === Applet.chosenBoard) || (Applet.chosenBoard == null)) {
       Applet.View.rerender()
