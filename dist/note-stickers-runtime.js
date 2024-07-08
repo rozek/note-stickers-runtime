@@ -10,6 +10,7 @@ const { observe, computed } = hyperactiv;
 import { throwError, SNS_Project, ValueIsName, allowBoard } from 'shareable-note-stickers';
 import { SNS_BoardView } from 'sns-boardview';
 const PUX = new ProtoUX();
+PUX['_ImageFolder'] = './icons/';
 const AppletRegistry = Object.create(null);
 /**** visitBoard ****/
 function visitBoard(Applet, Board) {
@@ -80,15 +81,15 @@ function validateVisitHistory(Applet) {
     }
     visitBoard(Applet, VisitHistory[Applet.VisitIndex] || Applet.Project.BoardList[0]);
 }
-/**** showConsole ****/
-function showConsole(Applet) {
+/**** openConsole ****/
+function openConsole(Applet) {
     if (!Applet.ConsoleIsOpen) {
         Applet.ConsoleIsOpen = true;
         Applet.View.rerender();
     }
 }
-/**** hideConsole ****/
-function hideConsole(Applet) {
+/**** closeConsole ****/
+function closeConsole(Applet) {
     if (Applet.ConsoleIsOpen) {
         Applet.ConsoleIsOpen = false;
         Applet.View.rerender();
@@ -248,11 +249,17 @@ function startApplet(SerializationElement, Placeholder) {
         console.error('NoteSticker: could not deserialize applet "' + Name + '"', Signal);
         return;
     }
+    const firstBoard = Project.Board(0);
     const Applet = AppletRegistry[Name] = observe({
-        Project, chosenBoard: undefined,
-        StickerList: [], selectedStickers: [], StickerSelectionGeometries: [],
-        SnapToGrid: false, GridWidth: 10, GridHeight: 10,
-        VisitHistory: [], VisitIndex: -1, View: undefined, ViewState: 0,
+        Project, chosenBoard: firstBoard,
+        StickerList: (firstBoard == null ? [] : firstBoard.StickerList),
+        selectedStickers: [], StickerSelectionGeometries: [],
+        SnapToGrid: (firstBoard == null ? false : firstBoard.SnapToGrid),
+        GridWidth: (firstBoard == null ? 10 : firstBoard.GridWidth || 10),
+        GridHeight: (firstBoard == null ? 10 : firstBoard.GridHeight || 10),
+        VisitHistory: (firstBoard == null ? [] : [firstBoard]),
+        VisitIndex: (firstBoard == null ? -1 : 0),
+        View: undefined, ViewState: 0,
         ConsoleIsOpen: false,
         ConsoleGeometry: {
             x: -Number.MAX_SAFE_INTEGER, y: -Number.MAX_SAFE_INTEGER, Width: 320, Height: 240
@@ -267,8 +274,8 @@ function startApplet(SerializationElement, Placeholder) {
         visitPrevBoard: visitPrevBoard.bind(null, Applet),
         visitNextBoard: visitNextBoard.bind(null, Applet),
         visitBoard: visitBoard.bind(null, Applet),
-        showConsole: showConsole.bind(null, Applet),
-        hideConsole: hideConsole.bind(null, Applet),
+        openConsole: openConsole.bind(null, Applet),
+        closeConsole: closeConsole.bind(null, Applet),
         clearConsole: clearConsole.bind(null, Applet),
         print: print.bind(null, Applet),
         println: println.bind(null, Applet),
@@ -289,6 +296,7 @@ class AppletView extends Component {
     }
     render(PropSet) {
         const { PUX, Applet } = PropSet;
+        Applet.View = this;
         const me = this;
         return html `<${SNS_BoardView}
         Mode="run"
@@ -296,9 +304,10 @@ class AppletView extends Component {
         selectedStickers=${Applet.selectedStickers}
         onSelectionChange=${(selectedStickers) => {
             Applet.selectedStickers = selectedStickers.slice();
+            Applet.StickerSelectionGeometries = selectedStickers.map((Sticker) => Sticker.Geometry);
             me.rerender();
         }}
-        LassoMode="contain"
+        LassoMode="enclose"
         onGeometryChange=${(StickerList, GeometryList) => {
             changeStickerGeometries(StickerList, GeometryList);
             me.rerender();
@@ -426,7 +435,8 @@ class ConsoleView extends Component {
         const CSSGeometry = (`left:${x}px; top:${y}px; width:${Width}px; height:${Height}px; right:auto; bottom:auto;`);
         return html `<div class="PUX ResizableDialog" style="
         position:fixed; ${CSSGeometry}
-      " <div class="ContentPane">${ConsoleValue}</div>
+      ">
+        <div class="ContentPane">${ConsoleValue}</div>
 
         <div class="Titlebar"
           onPointerDown=${DragRecognizer} onPointerUp=${DragRecognizer}
